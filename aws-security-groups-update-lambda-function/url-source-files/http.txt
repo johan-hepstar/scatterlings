@@ -1,0 +1,15 @@
+169.254.169.254
+assets.hepstar.com
+ergo-reiseblog.de
+eu-west-1.ec2.archive.ubuntu.com
+hepstar.com
+ppa.launchpad.net
+refundprotect.co
+refunds.refundprotect.co
+security.ubuntu.com
+validation-api.blueribbonbags.com
+www.alsagrins.ae
+www.apache.org
+www.ergo-reiseversicherung.de
+www.red24.com
+www.w3.org

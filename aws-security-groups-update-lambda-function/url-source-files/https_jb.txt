@@ -1,0 +1,7 @@
+dbeaver.io
+# repo1.maven.org is an alias for the below:
+dualstack.sonatype.map.fastly.net
+github.com
+objects.githubusercontent.com
+www.mysql.com
+www.gnu.org

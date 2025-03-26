@@ -1,0 +1,28 @@
+# Minimum for Ubuntu
+api.snapcraft.io
+apt.newrelic.com
+archive.canonical.com
+changelogs.ubuntu.com
+esm.ubuntu.com
+eu-west-1.ec2.archive.ubuntu.com
+ppa.launchpad.net
+security-metadata.canonical.com
+security.ubuntu.com
+www.apache.org
+
+# Others
+accounts.google.com
+database.clamav.net
+feed.wazuh.com
+oauth2.googleapis.com
+packages.wazuh.com
+packages.cloud.google.com
+storage.googleapis.com
+smtp.mandrillapp.com
+
+# Nginx
+nginx.org
+packages.amplify.nginx.com
+
+# Telegram
+api.telegram.org

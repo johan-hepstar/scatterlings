@@ -1,0 +1,6 @@
+0.ie.pool.ntp.org
+1.ie.pool.ntp.org
+2.ie.pool.ntp.org
+3.ie.pool.ntp.org
+time.aws.com
+169.254.169.123

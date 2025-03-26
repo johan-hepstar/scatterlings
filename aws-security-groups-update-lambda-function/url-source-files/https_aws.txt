@@ -1,0 +1,12 @@
+# AWS
+169.254.169.254
+ec2.amazonaws.com
+ec2.eu-west-1.amazonaws.com
+email.eu-west-1.amazonaws.com
+email-smtp.eu-west-1.amazonaws.com
+logs.eu-west-1.amazonaws.com
+monitoring.amazonaws.com
+monitoring.eu-west-1.amazonaws.com
+s3.amazonaws.com
+s3.eu-west-1.amazonaws.com
+ssm.eu-west-1.amazonaws.com

@@ -1,0 +1,2 @@
+email.eu-west-1.amazonaws.com
+packages.wazuh.com
