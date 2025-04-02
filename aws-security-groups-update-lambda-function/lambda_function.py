@@ -6,6 +6,8 @@ import socket
 
 from datetime import datetime
 
+url_ip_dict = {}
+
 def lambda_handler(event, context):
     try:
         print(f"----------------------------------------------------------------------")
@@ -61,7 +63,7 @@ def lambda_handler(event, context):
         # -----> All Hepstar Updates <-------
         sg_hepstar_fn = os.environ.get('SG_HEPSTAR_443_FILENAME')
 
-        # -----> All AppServer Updates <-------
+        #-----> All AppServer Updates <-------
         sg_appserver_fn = os.environ.get('SG_APPSERVER_443_FILENAME')
         
         print(f"----------------------------------------------------------------------")
@@ -106,7 +108,38 @@ def lambda_handler(event, context):
         sg_production_db_id = os.environ.get('PRODUCTION_SG_DB_443_ID')
         read_and_set_rules([sg_aws_fn], [sg_collection_db_id, sg_collection_uat_db_id, sg_production_db_id], 443)
 
+        #######################################################################
+        #######################################################################
+        # DNS UPDATES
+        #######################################################################
+        #######################################################################
+        print(f"----------------------------------------------------------------------")
+        print(f"---------> dns-updates <----------")
+        print(f"----------------------------------------------------------------------")
+        print(f"url_ip_dict: {url_ip_dict}")
+        print(f"----------------------------------------------------------------------")
+
+        current_datetime = datetime.now().strftime('%Y%m%d%H%M')
+        filename=f'dnsupdate{current_datetime}'
+        print(f"filename: {filename}")
         
+        single_ip_url_dict = {}
+        domain_list = []
+        domain_list.append("apac.chubbdigital.com")
+
+        for domain in domain_list:
+            print(f"domain: {domain}")
+            ip=url_ip_dict[domain]
+            print(f"ip: {ip}")
+            if ip:
+                single_ip_url_dict[ip]=domain
+
+        response=write_s3_dns(single_ip_url_dict, filename)
+        print(f"response:{response}")
+
+        ########################################################################
+        ########################################################################
+                
     except Exception as e:
         print(f"Main Function Execution Failed: {str(e)}")
         return {
@@ -167,11 +200,11 @@ def read_s3(file_name_str):
 
     region = os.environ.get('AWS_REGION')
     bucket_name = os.environ.get('S3_BUCKET_NAME')
-    folder_name = os.environ.get('S3_FOLDER_NAME')
+    read_folder_name = os.environ.get('S3_READ_FOLDER_NAME')
     file_name = os.environ.get(file_name_str)
-    file_location = folder_name + '/' + file_name_str
+    file_location = read_folder_name + '/' + file_name_str
 
-    print(f"folder_name: {folder_name}")
+    print(f"read_folder_name: {read_folder_name}")
     print(f"file_location: {file_location}")
 
     s3_client = boto3.client('s3', region_name = region)
@@ -190,6 +223,46 @@ def read_s3(file_name_str):
 
     return ips, urls
 
+def write_s3_dns(ip_url_dict, file_name):
+    print(f"-----> write_s3_dns")
+        
+    region = os.environ.get('AWS_REGION')
+    print(f"-----> region: {region}")
+    bucket_name = os.environ.get('S3_BUCKET_NAME')
+    print(f"-----> bucket_name: {bucket_name}")
+    folder_name = os.environ.get('S3_WRITE_FOLDER_NAME')
+    print(f"-----> folder_name: {folder_name}")
+
+    # DELETE ALL PREVIOUS FILES
+    s3_client = boto3.client('s3', region_name = region)
+    response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=folder_name)
+    files_in_folder = response["Contents"]
+    files_to_delete = []
+    for f in files_in_folder:
+        files_to_delete.append({"Key": f["Key"]})
+
+    print(f"-----> files_to_delete: {files_to_delete}")
+    response = s3_client.delete_objects(
+        Bucket=bucket_name, Delete={"Objects": files_to_delete}
+    )
+    print(f"-----> response: {response}")
+
+    file_location = folder_name + '/' + file_name
+    print(f"-----> file_location: {file_location}")
+    
+    file_content = ''
+    for key, value in ip_url_dict.items():  
+        file_content+=f'{key} {value}\n'
+    print(f"-----> file_content: {file_content}")
+
+    # Write file to S3
+    s3_client = boto3.client('s3', region_name = region)
+    s3_client.put_object(Bucket=bucket_name, Key=file_location, Body=file_content)
+
+    print(f"File {file_name} written to S3 bucket {bucket_name}")
+
+
+
 def valid_ip(address):
     try:
         ipaddress.ip_address(address)
@@ -206,8 +279,11 @@ def urls_to_ip_dict(port, urls):
             if addr_families and len(addr_families) > 0:
                 for addr_family in addr_families:
                     ip = addr_family[4][0]
-                    std_ip = format_ip(ip)
+                    
+                    if url not in url_ip_dict:
+                        url_ip_dict[url] = ip
 
+                    std_ip = format_ip(ip)
                     if std_ip not in ip_dict:
                         ip_dict[std_ip] = url
 
